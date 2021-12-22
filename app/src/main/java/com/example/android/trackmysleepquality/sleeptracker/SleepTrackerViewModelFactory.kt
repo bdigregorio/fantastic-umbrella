@@ -19,13 +19,13 @@ package com.example.android.trackmysleepquality.sleeptracker
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepRecordDao
 
 /**
- * Constructs the SleepTrackerViewModel from the SleepDatabaseDao and context.
+ * Constructs the SleepTrackerViewModel from the SleepRecordDao and context.
  */
 class SleepTrackerViewModelFactory(
-    private val dataSource: SleepDatabaseDao,
+    private val dataSource: SleepRecordDao,
     private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")

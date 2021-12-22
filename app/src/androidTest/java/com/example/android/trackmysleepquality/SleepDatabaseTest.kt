@@ -20,7 +20,7 @@ package com.example.android.trackmysleepquality
 //import androidx.test.ext.junit.runners.AndroidJUnit4
 //import androidx.test.platform.app.InstrumentationRegistry
 //import com.example.android.trackmysleepquality.database.SleepDatabase
-//import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+//import com.example.android.trackmysleepquality.database.SleepRecordDao
 //import com.example.android.trackmysleepquality.database.SleepNight
 //import org.junit.Assert.assertEquals
 //import org.junit.After
@@ -38,7 +38,7 @@ package com.example.android.trackmysleepquality
 //@RunWith(AndroidJUnit4::class)
 //class SleepDatabaseTest {
 //
-//    private lateinit var sleepDao: SleepDatabaseDao
+//    private lateinit var sleepDao: SleepRecordDao
 //    private lateinit var db: SleepDatabase
 //
 //    @Before

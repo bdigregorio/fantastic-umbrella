@@ -17,15 +17,16 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.AndroidViewModel
-import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepRecordDao
 
 /**
  * ViewModel for SleepTrackerFragment.
  */
 class SleepTrackerViewModel(
-        val database: SleepDatabaseDao,
-        application: Application) : AndroidViewModel(application) {
+        val database: SleepRecordDao,
+        application: Application
+) : AndroidViewModel(application) {
+
 }
 

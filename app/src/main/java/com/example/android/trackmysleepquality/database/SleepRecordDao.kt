@@ -38,7 +38,7 @@ interface SleepRecordDao {
     suspend fun clearAllSleepRecords()
 
     @Query(value = "SELECT * from sleep_quality_history_table ORDER BY id DESC")
-    suspend fun getAllSleepRecords(): List<LiveData<SleepRecordEntity>>
+    fun getAllSleepRecords(): LiveData<List<SleepRecordEntity>>
 
     @Query(value = "SELECT * from sleep_quality_history_table ORDER BY id DESC LIMIT 1")
     suspend fun getMostRecentSleepRecord(): SleepRecordEntity?

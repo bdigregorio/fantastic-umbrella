@@ -15,3 +15,22 @@
  */
 
 package com.example.android.trackmysleepquality.database
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "sleep_quality_history_table")
+data class SleepRecordEntity(
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0L,
+
+    @ColumnInfo(name = "start_time")
+    var startTime: Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "end_time")
+    var endTime: Long = startTime,
+
+    @ColumnInfo(name = "quality_score")
+    var qualityScore: Int = -1
+)

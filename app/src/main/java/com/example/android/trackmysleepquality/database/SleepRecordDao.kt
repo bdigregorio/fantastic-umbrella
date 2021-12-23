@@ -31,15 +31,15 @@ interface SleepRecordDao {
     @Update
     suspend fun update(sleepRecord: SleepRecordEntity)
 
-    @Query(value = "SELECT * from sleep_quality_history_table WHERE id = :id")
+    @Query(value = "SELECT * FROM sleep_quality_history_table WHERE id = :id")
     suspend fun getSleepRecord(id: Long): SleepRecordEntity
 
-    @Query(value = "DELETE from sleep_quality_history_table")
+    @Query(value = "DELETE FROM sleep_quality_history_table")
     suspend fun clearAllSleepRecords()
 
-    @Query(value = "SELECT * from sleep_quality_history_table ORDER BY id DESC")
+    @Query(value = "SELECT * FROM sleep_quality_history_table ORDER BY id DESC")
     fun getAllSleepRecords(): LiveData<List<SleepRecordEntity>>
 
-    @Query(value = "SELECT * from sleep_quality_history_table ORDER BY id DESC LIMIT 1")
+    @Query(value = "SELECT * FROM sleep_quality_history_table ORDER BY id DESC LIMIT 1")
     suspend fun getMostRecentSleepRecord(): SleepRecordEntity?
 }

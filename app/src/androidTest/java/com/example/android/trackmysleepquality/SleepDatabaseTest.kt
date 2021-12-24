@@ -23,7 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.database.SleepRecordDao
-import com.example.android.trackmysleepquality.database.SleepRecordEntity
+import com.example.android.trackmysleepquality.database.SleepRecord
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -41,7 +41,7 @@ class SleepDatabaseTest {
     private lateinit var sleepRecordDao: SleepRecordDao
     private lateinit var db: SleepDatabase
 
-    private val sampleSleepRecord = SleepRecordEntity(
+    private val sampleSleepRecord = SleepRecord(
         id = 12345,
         startTime = System.currentTimeMillis(),
         endTime = System.currentTimeMillis() + 123456L,
@@ -101,7 +101,7 @@ class SleepDatabaseTest {
         sleepRecordDao.insert(sampleSleepRecord)
         sleepRecordDao.insert(sampleSleepRecord.copy(id = 2))
         sleepRecordDao.insert(sampleSleepRecord.copy(id = 3))
-        val actualRecords: LiveData<List<SleepRecordEntity>> = sleepRecordDao.getAllSleepRecords()
+        val actualRecords: LiveData<List<SleepRecord>> = sleepRecordDao.getAllSleepRecords()
         Truth.assertThat(actualRecords.getOrAwaitValue()).hasSize(3)
 
         // when

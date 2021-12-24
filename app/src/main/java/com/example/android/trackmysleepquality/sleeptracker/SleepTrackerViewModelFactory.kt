@@ -19,19 +19,18 @@ package com.example.android.trackmysleepquality.sleeptracker
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.android.trackmysleepquality.database.SleepRecordDao
 
 /**
  * Constructs the SleepTrackerViewModel from the SleepRecordDao and context.
  */
 class SleepTrackerViewModelFactory(
-    private val dataSource: SleepRecordDao,
+    private val sleepTrackerRepository: SleepTrackerRepository,
     private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SleepTrackerViewModel::class.java)) {
-            return SleepTrackerViewModel(dataSource, application) as T
+            return SleepTrackerViewModel(sleepTrackerRepository, application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -21,7 +21,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "sleep_quality_history_table")
-data class SleepRecordEntity(
+data class SleepRecord(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0L,
 

@@ -31,22 +31,20 @@ import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerB
  * a database. Cumulative data is displayed in a simple scrollable TextView.
  */
 class SleepTrackerFragment : Fragment() {
-    private lateinit var binding: FragmentSleepTrackerBinding
-    private val viewModel: SleepTrackerViewModel by viewModels {
-        val application = requireNotNull(activity?.application)
-        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application))
-        SleepTrackerViewModelFactory(sleepTrackerRepository, application)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentSleepTrackerBinding.inflate(inflater).also { configureBinding(it) }.root
-
-    private fun configureBinding(inflatedBinding: FragmentSleepTrackerBinding) {
-        binding = inflatedBinding
+    ): View = FragmentSleepTrackerBinding.inflate(inflater).also { binding ->
         binding.lifecycleOwner = this
-        binding.sleepTrackerViewModel = viewModel
+        binding.sleepTrackerViewModel = buildViewModel()
+    }.root
+
+    private fun buildViewModel(): SleepTrackerViewModel {
+        val application = requireNotNull(activity?.application)
+        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application))
+        val vmFactory = SleepTrackerViewModelFactory(sleepTrackerRepository, application)
+        return ViewModelProvider(this, vmFactory).get(SleepTrackerViewModel::class.java)
     }
 }

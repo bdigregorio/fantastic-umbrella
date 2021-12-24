@@ -34,7 +34,8 @@ class SleepTrackerFragment : Fragment() {
     private lateinit var binding: FragmentSleepTrackerBinding
     private val viewModel: SleepTrackerViewModel by viewModels {
         val application = requireNotNull(activity?.application)
-        SleepTrackerViewModelFactory(SleepDatabase.getInstance(application).sleepRecordDao, application)
+        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application))
+        SleepTrackerViewModelFactory(sleepTrackerRepository, application)
     }
 
     override fun onCreateView(

@@ -17,6 +17,7 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,6 +40,26 @@ class SleepTrackerViewModel(
         }
     }
 
-    
+    fun onClickStart() {
+        viewModelScope.launch {
+            sleepTrackerRepository.addNewRecord(SleepRecord())
+            currentSleep.value = sleepTrackerRepository.getCurrentSleep()
+        }
+    }
+
+    fun onClickStop() {
+        viewModelScope.launch {
+            currentSleep.value?.let { sleepRecord ->
+                sleepRecord.endTime = System.currentTimeMillis()
+                sleepTrackerRepository.update(sleepRecord)
+            }
+        }
+    }
+
+    fun onClickClear() {
+        viewModelScope.launch {
+            sleepTrackerRepository.clearAllRecords()
+        }
+    }
 }
 

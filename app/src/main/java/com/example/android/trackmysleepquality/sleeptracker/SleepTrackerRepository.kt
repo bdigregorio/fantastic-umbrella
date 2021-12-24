@@ -20,4 +20,16 @@ class SleepTrackerRepository(
 
         return sleep
     }
+
+    suspend fun addNewRecord(currentSleep: SleepRecord) {
+        sleepRecordDao.insert(currentSleep)
+    }
+
+    suspend fun update(sleepRecord: SleepRecord) {
+        sleepRecordDao.update(sleepRecord)
+    }
+
+    suspend fun clearAllRecords() {
+        sleepRecordDao.clearAllSleepRecords()
+    }
 }

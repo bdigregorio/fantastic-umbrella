@@ -26,20 +26,20 @@ import androidx.room.Update
 @Dao
 interface SleepRecordDao {
     @Insert
-    suspend fun insert(sleepRecord: SleepRecordEntity)
+    suspend fun insert(sleepRecord: SleepRecord)
 
     @Update
-    suspend fun update(sleepRecord: SleepRecordEntity)
+    suspend fun update(sleepRecord: SleepRecord)
 
     @Query(value = "SELECT * FROM sleep_quality_history_table WHERE id = :id")
-    suspend fun getSleepRecord(id: Long): SleepRecordEntity
+    suspend fun getSleepRecord(id: Long): SleepRecord
 
     @Query(value = "DELETE FROM sleep_quality_history_table")
     suspend fun clearAllSleepRecords()
 
     @Query(value = "SELECT * FROM sleep_quality_history_table ORDER BY id DESC")
-    fun getAllSleepRecords(): LiveData<List<SleepRecordEntity>>
+    fun getAllSleepRecords(): LiveData<List<SleepRecord>>
 
     @Query(value = "SELECT * FROM sleep_quality_history_table ORDER BY id DESC LIMIT 1")
-    suspend fun getMostRecentSleepRecord(): SleepRecordEntity?
+    suspend fun getMostRecentSleepRecord(): SleepRecord?
 }

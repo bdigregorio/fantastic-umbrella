@@ -43,7 +43,7 @@ class SleepTrackerFragment : Fragment() {
 
     private fun buildViewModel(): SleepTrackerViewModel {
         val application = requireNotNull(activity?.application)
-        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application))
+        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application).sleepRecordDao)
         val vmFactory = SleepTrackerViewModelFactory(sleepTrackerRepository, application)
         return ViewModelProvider(this, vmFactory).get(SleepTrackerViewModel::class.java)
     }

@@ -1,8 +1,23 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
-import com.example.android.trackmysleepquality.database.SleepDatabase
+import androidx.lifecycle.LiveData
+import com.example.android.trackmysleepquality.database.SleepRecord
+import com.example.android.trackmysleepquality.database.SleepRecordDao
 
 class SleepTrackerRepository(
-    private val sleepDatabase: SleepDatabase
+    private val sleepRecordDao: SleepRecordDao
 ) {
+    fun getAllRecords(): LiveData<List<SleepRecord>> {
+        return sleepRecordDao.getAllSleepRecords()
+    }
+
+    suspend fun getCurrentSleep(): SleepRecord? {
+        var sleep = sleepRecordDao.getMostRecentSleepRecord()
+
+        if (sleep?.endTime != sleep?.startTime) {
+            sleep = null
+        }
+
+        return sleep
+    }
 }

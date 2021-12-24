@@ -21,7 +21,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [SleepRecordEntity::class], version = 1)
+@Database(entities = [SleepRecord::class], version = 1)
 abstract class SleepDatabase : RoomDatabase() {
     abstract val sleepRecordDao: SleepRecordDao
 

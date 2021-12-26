@@ -19,6 +19,8 @@ package com.example.android.trackmysleepquality.sleepquality
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class SleepQualityViewModel(
     private val sleepRecordId: Long,
@@ -29,10 +31,14 @@ class SleepQualityViewModel(
     val navEventDoneWithQuality: LiveData<Boolean>
         get() = _navEventDoneWithQuality
 
-    fun saveQualityScore(qualityScore: Int) {
-        // save with repository
-
-        _navEventDoneWithQuality.value = true
+    fun saveQualityScore(updatedQualityScore: Int) {
+        viewModelScope.launch {
+            val updatedSleepRecord = sleepQualityRepository.getSleepRecord(sleepRecordId).apply {
+                qualityScore = updatedQualityScore
+            }
+            sleepQualityRepository.updateSleepRecord(updatedSleepRecord)
+            _navEventDoneWithQuality.value = true
+        }
     }
 
     fun navEventDoneHandled() {

@@ -24,8 +24,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * A fragment with buttons to record start and end times for sleep, which are saved in
@@ -56,17 +58,25 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun configureObservers(viewModel: SleepTrackerViewModel) {
-        viewModel.sleepTrackerEvent.observe(this) { event: SleepTrackerEvent ->
-            Log.i(TAG, "Received SleepTrackerEvent: $event")
+        viewModel.viewEvents.observe(this) { event: SleepTrackerViewEvent ->
+            Log.i(TAG, "Received SleepTrackerViewEvent: $event")
             when (event) {
-                SleepTrackerEvent.Await -> {}
-                SleepTrackerEvent.RecordsCleared -> {}
-                is SleepTrackerEvent.EndTracking -> {
-                    navigateToQuality(event.sleepRecord.id)
+                SleepTrackerViewEvent.Await -> {}
+                SleepTrackerViewEvent.ShowClearedSnackbar -> {
+                    showClearedRecordsSnackbar(view)
+                }
+                is SleepTrackerViewEvent.NavigateToQuality -> {
+                    navigateToQuality(event.sleepRecordId)
                 }
             }
 
             viewModel.eventHandled()
+        }
+    }
+
+    private fun showClearedRecordsSnackbar(root: View?) {
+        root?.let { rootView ->
+            Snackbar.make(rootView, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
         }
     }
 

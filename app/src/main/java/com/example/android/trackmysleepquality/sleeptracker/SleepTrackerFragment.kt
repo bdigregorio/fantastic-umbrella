@@ -17,6 +17,7 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.database.SleepDatabase
-import com.example.android.trackmysleepquality.database.SleepRecord
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 
 /**
@@ -52,20 +52,32 @@ class SleepTrackerFragment : Fragment() {
                 application
             )
         }
-        return viewModel.also(::configureViewModel)
+        return viewModel.also(::configureObservers)
     }
 
-    private fun configureViewModel(viewModel: SleepTrackerViewModel) {
-        viewModel.eventGetQuality.observe(this) { sleepRecordToRate: SleepRecord? ->
-            sleepRecordToRate?.let { sleepRecord ->
-                findNavController().navigate(
-                    SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(
-                        sleepRecord.id
-                    )
-                )
-
-                viewModel.eventGetQualityHandled()
+    private fun configureObservers(viewModel: SleepTrackerViewModel) {
+        viewModel.sleepTrackerEvent.observe(this) { event: SleepTrackerEvent ->
+            Log.i(TAG, "Received SleepTrackerEvent: $event")
+            when (event) {
+                SleepTrackerEvent.Await -> {}
+                SleepTrackerEvent.RecordsCleared -> {}
+                is SleepTrackerEvent.EndTracking -> {
+                    navigateToQuality(event.sleepRecord.id)
+                }
             }
+
+            viewModel.eventHandled()
         }
+    }
+
+    private fun navigateToQuality(sleepRecordId: Long) {
+        findNavController().navigate(
+            SleepTrackerFragmentDirections
+                .actionSleepTrackerFragmentToSleepQualityFragment(sleepRecordId)
+        )
+    }
+
+    companion object {
+        val TAG = SleepTrackerFragment::class.simpleName
     }
 }

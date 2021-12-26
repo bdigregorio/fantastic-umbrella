@@ -47,11 +47,12 @@ class SleepTrackerViewModel(
         sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
     }
 
-    private val _eventGetQuality = MutableLiveData<SleepRecord?>()
-    val eventGetQuality: LiveData<SleepRecord?>
-        get() = _eventGetQuality
+    private val _sleepTrackerEvent = MutableLiveData<SleepTrackerEvent>()
+    val sleepTrackerEvent: LiveData<SleepTrackerEvent>
+        get() = _sleepTrackerEvent
 
     init {
+        _sleepTrackerEvent.value = SleepTrackerEvent.Await
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
         }
@@ -69,7 +70,7 @@ class SleepTrackerViewModel(
             currentSleep.value?.let { sleepRecord ->
                 sleepRecord.endTime = System.currentTimeMillis()
                 sleepTrackerRepository.update(sleepRecord)
-                _eventGetQuality.value = sleepRecord
+                _sleepTrackerEvent.value = SleepTrackerEvent.EndTracking(sleepRecord)
             }
         }
     }
@@ -80,8 +81,10 @@ class SleepTrackerViewModel(
         }
     }
 
-    fun eventGetQualityHandled() {
-        _eventGetQuality.value = null
+    fun eventHandled() {
+        if (_sleepTrackerEvent.value != SleepTrackerEvent.Await) {
+            _sleepTrackerEvent.value = SleepTrackerEvent.Await
+        }
     }
 }
 

@@ -16,6 +16,8 @@
 
 package com.example.android.trackmysleepquality.sleepquality
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class SleepQualityViewModel(
@@ -23,4 +25,17 @@ class SleepQualityViewModel(
     private val sleepQualityRepository: SleepQualityRepository
 ) : ViewModel() {
 
+    private val _navEventDoneWithQuality = MutableLiveData<Boolean>()
+    val navEventDoneWithQuality: LiveData<Boolean>
+        get() = _navEventDoneWithQuality
+
+    fun saveQualityScore(qualityScore: Int) {
+        // save with repository
+
+        _navEventDoneWithQuality.value = true
+    }
+
+    fun navEventDoneHandled() {
+        _navEventDoneWithQuality.value = false
+    }
 }

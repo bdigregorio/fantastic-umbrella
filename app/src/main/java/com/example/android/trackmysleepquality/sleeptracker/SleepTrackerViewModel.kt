@@ -41,6 +41,12 @@ class SleepTrackerViewModel(
         formatNights(records, application.resources)
     }
 
+    val isStartButtonVisible = Transformations.map(currentSleep) { it == null }
+    val isStopButtonVisible = Transformations.map(currentSleep) { it != null }
+    val isClearButtonVisible = Transformations.map(sleepRecords) { sleepRecords ->
+        sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
+    }
+
     private val _eventGetQuality = MutableLiveData<SleepRecord?>()
     val eventGetQuality: LiveData<SleepRecord?>
         get() = _eventGetQuality

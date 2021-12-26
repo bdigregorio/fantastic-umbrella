@@ -22,8 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.database.SleepDatabase
+import com.example.android.trackmysleepquality.database.SleepRecord
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 
 /**
@@ -43,8 +44,28 @@ class SleepTrackerFragment : Fragment() {
 
     private fun buildViewModel(): SleepTrackerViewModel {
         val application = requireNotNull(activity?.application)
-        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application).sleepRecordDao)
-        val vmFactory = SleepTrackerViewModelFactory(sleepTrackerRepository, application)
-        return ViewModelProvider(this, vmFactory).get(SleepTrackerViewModel::class.java)
+        val sleepTrackerRepository =
+            SleepTrackerRepository(SleepDatabase.getInstance(application).sleepRecordDao)
+        val viewModel by viewModels<SleepTrackerViewModel> {
+            SleepTrackerViewModelFactory(
+                sleepTrackerRepository,
+                application
+            )
+        }
+        return viewModel.also(::configureViewModel)
+    }
+
+    private fun configureViewModel(viewModel: SleepTrackerViewModel) {
+        viewModel.eventGetQuality.observe(this) { sleepRecordToRate: SleepRecord? ->
+            sleepRecordToRate?.let { sleepRecord ->
+                findNavController().navigate(
+                    SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(
+                        sleepRecord.id
+                    )
+                )
+
+                viewModel.eventGetQualityHandled()
+            }
+        }
     }
 }

@@ -37,10 +37,7 @@ class SleepQualityFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return FragmentSleepQualityBinding.inflate(inflater).also { binding ->
-            val application = requireNotNull(this.activity).application
-
-        }.root
-    }
+    ): View = FragmentSleepQualityBinding.inflate(inflater).also { binding ->
+        binding.lifecycleOwner = this
+    }.root
 }

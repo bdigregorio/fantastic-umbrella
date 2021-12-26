@@ -41,6 +41,10 @@ class SleepTrackerViewModel(
         formatNights(records, application.resources)
     }
 
+    private val _eventGetQuality = MutableLiveData<SleepRecord?>()
+    val eventGetQuality: LiveData<SleepRecord?>
+        get() = _eventGetQuality
+
     init {
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
@@ -59,6 +63,7 @@ class SleepTrackerViewModel(
             currentSleep.value?.let { sleepRecord ->
                 sleepRecord.endTime = System.currentTimeMillis()
                 sleepTrackerRepository.update(sleepRecord)
+                _eventGetQuality.value = sleepRecord
             }
         }
     }
@@ -67,6 +72,10 @@ class SleepTrackerViewModel(
         viewModelScope.launch {
             sleepTrackerRepository.clearAllRecords()
         }
+    }
+
+    fun eventGetQualityHandled() {
+        _eventGetQuality.value = null
     }
 }
 

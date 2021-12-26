@@ -20,9 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.example.android.trackmysleepquality.R
+import androidx.fragment.app.viewModels
+import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepQualityBinding
 
 /**
@@ -39,5 +39,14 @@ class SleepQualityFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View = FragmentSleepQualityBinding.inflate(inflater).also { binding ->
         binding.lifecycleOwner = this
+        binding.sleepQualityViewModel = buildViewModel(binding)
     }.root
+
+    private fun buildViewModel(binding: FragmentSleepQualityBinding): SleepQualityViewModel {
+        val application = requireNotNull(activity?.application)
+        val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
+        val repository = SleepQualityRepository(sleepRecordDao)
+        val viewModel by viewModels<SleepQualityViewModel> { SleepQualityViewModelFactory(repository) }
+        return viewModel
+    }
 }

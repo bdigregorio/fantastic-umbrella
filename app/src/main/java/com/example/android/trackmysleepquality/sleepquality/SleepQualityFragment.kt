@@ -20,9 +20,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import com.example.android.trackmysleepquality.R
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepQualityBinding
 
 /**
@@ -37,10 +38,35 @@ class SleepQualityFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return FragmentSleepQualityBinding.inflate(inflater).also { binding ->
-            val application = requireNotNull(this.activity).application
+    ): View = FragmentSleepQualityBinding.inflate(inflater).also { binding ->
+        binding.lifecycleOwner = this
+        binding.sleepQualityViewModel = buildViewModel()
+    }.root
 
-        }.root
+    private fun buildViewModel(): SleepQualityViewModel {
+        arguments?.let { args ->
+            val sleepRecordId = SleepQualityFragmentArgs.fromBundle(args).sleepRecordId
+            val application = requireNotNull(activity?.application)
+            val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
+            val repository = SleepQualityRepository(sleepRecordDao)
+            val viewModel by viewModels<SleepQualityViewModel> {
+                SleepQualityViewModelFactory(
+                    sleepRecordId,
+                    repository
+                )
+            }
+            return viewModel.also(::observeViewModel)
+        }
+
+        throw IllegalStateException("Missing sleepRecordId in Fragment arguments")
+    }
+
+    private fun observeViewModel(viewModel: SleepQualityViewModel) {
+        viewModel.navEventDoneWithQuality.observe(this) { qualityIsUpdated ->
+            if (qualityIsUpdated) {
+                findNavController().navigate(SleepQualityFragmentDirections.actionSleepQualityFragmentToSleepTrackerFragment())
+                viewModel.navEventDoneHandled()
+            }
+        }
     }
 }

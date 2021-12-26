@@ -17,14 +17,17 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
+import com.google.android.material.snackbar.Snackbar
 
 /**
  * A fragment with buttons to record start and end times for sleep, which are saved in
@@ -43,8 +46,48 @@ class SleepTrackerFragment : Fragment() {
 
     private fun buildViewModel(): SleepTrackerViewModel {
         val application = requireNotNull(activity?.application)
-        val sleepTrackerRepository = SleepTrackerRepository(SleepDatabase.getInstance(application).sleepRecordDao)
-        val vmFactory = SleepTrackerViewModelFactory(sleepTrackerRepository, application)
-        return ViewModelProvider(this, vmFactory).get(SleepTrackerViewModel::class.java)
+        val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
+        val sleepTrackerRepository = SleepTrackerRepository(sleepRecordDao)
+        val viewModel by viewModels<SleepTrackerViewModel> {
+            SleepTrackerViewModelFactory(
+                sleepTrackerRepository,
+                application
+            )
+        }
+        return viewModel.also(::configureObservers)
+    }
+
+    private fun configureObservers(viewModel: SleepTrackerViewModel) {
+        viewModel.viewEvents.observe(this) { event: SleepTrackerViewEvent ->
+            Log.i(TAG, "Received SleepTrackerViewEvent: $event")
+            when (event) {
+                SleepTrackerViewEvent.Await -> {}
+                SleepTrackerViewEvent.ShowClearedSnackbar -> {
+                    showClearedRecordsSnackbar(view)
+                }
+                is SleepTrackerViewEvent.NavigateToQuality -> {
+                    navigateToQuality(event.sleepRecordId)
+                }
+            }
+
+            viewModel.eventHandled()
+        }
+    }
+
+    private fun showClearedRecordsSnackbar(root: View?) {
+        root?.let { rootView ->
+            Snackbar.make(rootView, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun navigateToQuality(sleepRecordId: Long) {
+        findNavController().navigate(
+            SleepTrackerFragmentDirections
+                .actionSleepTrackerFragmentToSleepQualityFragment(sleepRecordId)
+        )
+    }
+
+    companion object {
+        val TAG = SleepTrackerFragment::class.simpleName
     }
 }

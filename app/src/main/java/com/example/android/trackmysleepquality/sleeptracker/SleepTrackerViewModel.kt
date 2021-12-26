@@ -41,7 +41,18 @@ class SleepTrackerViewModel(
         formatNights(records, application.resources)
     }
 
+    val isStartButtonVisible = Transformations.map(currentSleep) { it == null }
+    val isStopButtonVisible = Transformations.map(currentSleep) { it != null }
+    val isClearButtonVisible = Transformations.map(sleepRecords) { sleepRecords ->
+        sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
+    }
+
+    private val _viewEvents = MutableLiveData<SleepTrackerViewEvent>()
+    val viewEvents: LiveData<SleepTrackerViewEvent>
+        get() = _viewEvents
+
     init {
+        _viewEvents.value = SleepTrackerViewEvent.Await
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
         }
@@ -59,6 +70,7 @@ class SleepTrackerViewModel(
             currentSleep.value?.let { sleepRecord ->
                 sleepRecord.endTime = System.currentTimeMillis()
                 sleepTrackerRepository.update(sleepRecord)
+                _viewEvents.value = SleepTrackerViewEvent.NavigateToQuality(sleepRecord.id)
             }
         }
     }
@@ -66,6 +78,13 @@ class SleepTrackerViewModel(
     fun onClickClear() {
         viewModelScope.launch {
             sleepTrackerRepository.clearAllRecords()
+            _viewEvents.value = SleepTrackerViewEvent.ShowClearedSnackbar
+        }
+    }
+
+    fun eventHandled() {
+        if (_viewEvents.value != SleepTrackerViewEvent.Await) {
+            _viewEvents.value = SleepTrackerViewEvent.Await
         }
     }
 }

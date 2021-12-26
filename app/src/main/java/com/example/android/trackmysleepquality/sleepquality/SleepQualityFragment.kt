@@ -39,14 +39,24 @@ class SleepQualityFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View = FragmentSleepQualityBinding.inflate(inflater).also { binding ->
         binding.lifecycleOwner = this
-        binding.sleepQualityViewModel = buildViewModel(binding)
+        binding.sleepQualityViewModel = buildViewModel()
     }.root
 
-    private fun buildViewModel(binding: FragmentSleepQualityBinding): SleepQualityViewModel {
-        val application = requireNotNull(activity?.application)
-        val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
-        val repository = SleepQualityRepository(sleepRecordDao)
-        val viewModel by viewModels<SleepQualityViewModel> { SleepQualityViewModelFactory(repository) }
-        return viewModel
+    private fun buildViewModel(): SleepQualityViewModel {
+        arguments?.let { args ->
+            val sleepRecordId = SleepQualityFragmentArgs.fromBundle(args).sleepRecordId
+            val application = requireNotNull(activity?.application)
+            val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
+            val repository = SleepQualityRepository(sleepRecordDao)
+            val viewModel by viewModels<SleepQualityViewModel> {
+                SleepQualityViewModelFactory(
+                    sleepRecordId,
+                    repository
+                )
+            }
+            return viewModel
+        }
+
+        throw IllegalStateException("Missing sleepRecordId in Fragment arguments")
     }
 }

@@ -34,31 +34,44 @@ import com.google.android.material.snackbar.Snackbar
  * a database. Cumulative data is displayed in a simple scrollable TextView.
  */
 class SleepTrackerFragment : Fragment() {
+    val binding by lazy { FragmentSleepTrackerBinding.inflate(layoutInflater) }
+    val viewModel by viewModels<SleepTrackerViewModel> {
+        val application = requireNotNull(activity?.application)
+        val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
+        val sleepTrackerRepository = SleepTrackerRepository(sleepRecordDao)
+        SleepTrackerViewModelFactory(
+            sleepTrackerRepository,
+            application
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = FragmentSleepTrackerBinding.inflate(inflater).also { binding ->
+    ): View {
         binding.lifecycleOwner = this
-        binding.sleepTrackerViewModel = buildViewModel()
-    }.root
-
-    private fun buildViewModel(): SleepTrackerViewModel {
-        val application = requireNotNull(activity?.application)
-        val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
-        val sleepTrackerRepository = SleepTrackerRepository(sleepRecordDao)
-        val viewModel by viewModels<SleepTrackerViewModel> {
-            SleepTrackerViewModelFactory(
-                sleepTrackerRepository,
-                application
-            )
-        }
-        return viewModel.also(::configureObservers)
+        binding.sleepTrackerViewModel = viewModel
+        return binding.root
     }
 
-    private fun configureObservers(viewModel: SleepTrackerViewModel) {
-        viewModel.viewEvents.observe(this) { event: SleepTrackerViewEvent ->
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        configureRecyclerView()
+        subscribeToViewModelEvents(viewModel)
+    }
+
+    private fun configureRecyclerView() {
+        val sleepRecordAdapter = SleepRecordAdapter()
+        binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
+        viewModel.sleepRecords.observe(viewLifecycleOwner) {
+            Log.d(TAG, "Observed change in viewmodel's sleep records, updating adapter")
+            it?.let { sleepRecordAdapter.sleepRecords = it }
+        }
+    }
+
+    private fun subscribeToViewModelEvents(viewModel: SleepTrackerViewModel) {
+        viewModel.viewEvents.observe(viewLifecycleOwner) { event: SleepTrackerViewEvent ->
             Log.i(TAG, "Received SleepTrackerViewEvent: $event")
             when (event) {
                 SleepTrackerViewEvent.Await -> {}
@@ -75,9 +88,7 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun showClearedRecordsSnackbar(root: View?) {
-        root?.let { rootView ->
-            Snackbar.make(rootView, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
-        }
+        Snackbar.make(binding.root, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
     }
 
     private fun navigateToQuality(sleepRecordId: Long) {

@@ -36,7 +36,7 @@ class SleepTrackerViewModel(
 ) : AndroidViewModel(application) {
 
     private var currentSleep = MutableLiveData<SleepRecord?>()
-    private val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
+    val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
     val formattedRecords: LiveData<Spanned> = Transformations.map(sleepRecords) { records ->
         formatNights(records, application.resources)
     }

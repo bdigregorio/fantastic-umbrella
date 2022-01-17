@@ -47,12 +47,12 @@ class SleepTrackerViewModel(
         sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
     }
 
-    private val _viewEvents = MutableLiveData<SleepTrackerViewEvent>()
+    private val _viewEvents =
+        MutableLiveData<SleepTrackerViewEvent>(SleepTrackerViewEvent.SubscribeToViewModel)
     val viewEvents: LiveData<SleepTrackerViewEvent>
         get() = _viewEvents
 
     init {
-        _viewEvents.value = SleepTrackerViewEvent.Await
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
         }
@@ -78,13 +78,7 @@ class SleepTrackerViewModel(
     fun onClickClear() {
         viewModelScope.launch {
             sleepTrackerRepository.clearAllRecords()
-            _viewEvents.value = SleepTrackerViewEvent.ShowClearedSnackbar
-        }
-    }
-
-    fun eventHandled() {
-        if (_viewEvents.value != SleepTrackerViewEvent.Await) {
-            _viewEvents.value = SleepTrackerViewEvent.Await
+            _viewEvents.value = SleepTrackerViewEvent.ClearAllRecords
         }
     }
 }

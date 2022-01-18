@@ -17,14 +17,12 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
-import android.text.Spanned
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.example.android.trackmysleepquality.database.SleepRecord
-import com.example.android.trackmysleepquality.formatNights
 import kotlinx.coroutines.launch
 
 /**
@@ -37,9 +35,6 @@ class SleepTrackerViewModel(
 
     private var currentSleep = MutableLiveData<SleepRecord?>()
     val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
-    val formattedRecords: LiveData<Spanned> = Transformations.map(sleepRecords) { records ->
-        formatNights(records, application.resources)
-    }
 
     val isStartButtonVisible = Transformations.map(currentSleep) { it == null }
     val isStopButtonVisible = Transformations.map(currentSleep) { it != null }

@@ -2,12 +2,14 @@ package com.example.android.trackmysleepquality.sleeptracker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.trackmysleepquality.R
+import com.example.android.trackmysleepquality.convertNumericQualityToImageRes
+import com.example.android.trackmysleepquality.convertNumericQualityToString
+import com.example.android.trackmysleepquality.convertToDateString
 import com.example.android.trackmysleepquality.database.SleepRecord
+import com.example.android.trackmysleepquality.databinding.ItemSleepRecordBinding
 
-class SleepRecordAdapter : RecyclerView.Adapter<SleepRecordAdapter.TextItemViewHolder>() {
+class SleepRecordAdapter : RecyclerView.Adapter<SleepRecordAdapter.SleepRecordViewHolder>() {
 
     var sleepRecords = listOf<SleepRecord>()
         set(value) {
@@ -17,23 +19,24 @@ class SleepRecordAdapter : RecyclerView.Adapter<SleepRecordAdapter.TextItemViewH
 
     override fun getItemCount() = sleepRecords.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TextItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepRecordViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_text, parent, false) as TextView
-        return TextItemViewHolder(view)
+        val binding = ItemSleepRecordBinding.inflate(inflater, parent, false)
+        return SleepRecordViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: TextItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SleepRecordViewHolder, position: Int) {
         val record = sleepRecords[position]
-        holder.textView.text = record.qualityScore.toString()
+        with(holder.binding) {
+            sleepIcon.setImageResource(record.qualityScore.convertNumericQualityToImageRes())
+            sleepQuality.text = record.qualityScore.convertNumericQualityToString(root.resources)
+            sleepDescription.text = record.startTime.convertToDateString()
+        }
     }
 
     /**
-     * ViewHolder stub for validation of adapter.
+     * ViewHolder class for SleepRecord
      */
-    class TextItemViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
-
-    companion object {
-        val TAG = SleepRecordAdapter::class.simpleName
-    }
+    class SleepRecordViewHolder(val binding: ItemSleepRecordBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

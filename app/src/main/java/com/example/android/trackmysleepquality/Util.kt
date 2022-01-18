@@ -18,12 +18,15 @@ package com.example.android.trackmysleepquality
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
-import android.os.Build
-import android.text.Html
-import android.text.Spanned
-import androidx.core.text.HtmlCompat
 import com.example.android.trackmysleepquality.database.SleepRecord
 import java.text.SimpleDateFormat
+import java.util.concurrent.TimeUnit
+
+/**
+ * These functions create a formatted string that can be set in a TextView.
+ */
+private val ONE_MINUTE_MILLIS = TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES)
+private val ONE_HOUR_MILLIS = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS)
 
 /**
  * These functions create a formatted string that can be set in a TextView.
@@ -53,6 +56,36 @@ fun Int.convertNumericQualityToImageRes() = when (this) {
     4 -> R.drawable.ic_sleep_4
     5 -> R.drawable.ic_sleep_5
     else -> R.drawable.ic_sleep_3
+}
+
+/**
+ * Convert a duration to a formatted string for display.
+ *
+ * Examples:
+ *
+ * 6 seconds on Wednesday
+ * 2 minutes on Monday
+ * 40 hours on Thursday
+ *
+ * @param res resources used to load formatted strings
+ */
+fun SleepRecord.durationToFormattedString(res: Resources): String {
+    val durationMilli = endTime - startTime
+    val dateString = startTime.convertToDateString()
+    return when {
+        durationMilli < ONE_MINUTE_MILLIS -> {
+            val seconds = TimeUnit.SECONDS.convert(durationMilli, TimeUnit.MILLISECONDS)
+            res.getString(R.string.seconds_length, seconds, dateString)
+        }
+        durationMilli < ONE_HOUR_MILLIS -> {
+            val minutes = TimeUnit.MINUTES.convert(durationMilli, TimeUnit.MILLISECONDS)
+            res.getString(R.string.minutes_length, minutes, dateString)
+        }
+        else -> {
+            val hours = TimeUnit.HOURS.convert(durationMilli, TimeUnit.MILLISECONDS)
+            res.getString(R.string.hours_length, hours, dateString)
+        }
+    }
 }
 
 

@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
+import com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordAdapter
 import com.google.android.material.snackbar.Snackbar
 
 /**

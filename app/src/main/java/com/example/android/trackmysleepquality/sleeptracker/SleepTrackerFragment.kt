@@ -67,7 +67,7 @@ class SleepTrackerFragment : Fragment() {
         binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
         viewModel.sleepRecords.observe(viewLifecycleOwner) {
             Log.d(TAG, "Observed change in viewmodel's sleep records, updating adapter")
-            it?.let { sleepRecordAdapter.sleepRecords = it }
+            it?.let { sleepRecordAdapter.submitList(it) }
         }
     }
 

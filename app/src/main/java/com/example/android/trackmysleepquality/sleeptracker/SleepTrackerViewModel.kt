@@ -17,14 +17,12 @@
 package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
-import android.text.Spanned
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.example.android.trackmysleepquality.database.SleepRecord
-import com.example.android.trackmysleepquality.formatNights
 import kotlinx.coroutines.launch
 
 /**
@@ -36,10 +34,7 @@ class SleepTrackerViewModel(
 ) : AndroidViewModel(application) {
 
     private var currentSleep = MutableLiveData<SleepRecord?>()
-    private val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
-    val formattedRecords: LiveData<Spanned> = Transformations.map(sleepRecords) { records ->
-        formatNights(records, application.resources)
-    }
+    val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
 
     val isStartButtonVisible = Transformations.map(currentSleep) { it == null }
     val isStopButtonVisible = Transformations.map(currentSleep) { it != null }
@@ -47,12 +42,12 @@ class SleepTrackerViewModel(
         sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
     }
 
-    private val _viewEvents = MutableLiveData<SleepTrackerViewEvent>()
+    private val _viewEvents =
+        MutableLiveData<SleepTrackerViewEvent>(SleepTrackerViewEvent.SubscribeToViewModel)
     val viewEvents: LiveData<SleepTrackerViewEvent>
         get() = _viewEvents
 
     init {
-        _viewEvents.value = SleepTrackerViewEvent.Await
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
         }
@@ -78,13 +73,7 @@ class SleepTrackerViewModel(
     fun onClickClear() {
         viewModelScope.launch {
             sleepTrackerRepository.clearAllRecords()
-            _viewEvents.value = SleepTrackerViewEvent.ShowClearedSnackbar
-        }
-    }
-
-    fun eventHandled() {
-        if (_viewEvents.value != SleepTrackerViewEvent.Await) {
-            _viewEvents.value = SleepTrackerViewEvent.Await
+            _viewEvents.value = SleepTrackerViewEvent.ClearAllRecords
         }
     }
 }

@@ -77,17 +77,19 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun subscribeToViewModelEvents(viewModel: SleepTrackerViewModel) {
-        viewModel.viewEvents.observe(viewLifecycleOwner) { event: SleepTrackerViewEvent ->
-            Log.i(TAG, "Received SleepTrackerViewEvent: $event")
+        viewModel.sleepTrackerEvent.observe(viewLifecycleOwner) { event: SleepTrackerEvent ->
+            Log.i(TAG, "Received SleepTrackerEvent: $event")
             when (event) {
-                SleepTrackerViewEvent.SubscribeToViewModel -> {
-                    Log.d(TAG, "Observing event stream from ViewModel")
+                SleepTrackerEvent.Await -> {
+                    Log.d(TAG, "Awaiting next ui event")
                 }
-                SleepTrackerViewEvent.ClearAllRecords -> {
-                    showClearedRecordsSnackbar(view)
-                }
-                is SleepTrackerViewEvent.NavigateToQuality -> {
+                is SleepTrackerEvent.Stop -> {
                     navigateToQuality(event.sleepRecordId)
+                    viewModel.awaitNextEvent()
+                }
+                SleepTrackerEvent.Clear -> {
+                    showClearedRecordsSnackbar(view)
+                    viewModel.awaitNextEvent()
                 }
             }
         }

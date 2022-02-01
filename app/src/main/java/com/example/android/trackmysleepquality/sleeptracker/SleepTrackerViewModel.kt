@@ -16,11 +16,10 @@
 
 package com.example.android.trackmysleepquality.sleeptracker
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.trackmysleepquality.database.SleepRecord
 import kotlinx.coroutines.launch
@@ -29,9 +28,8 @@ import kotlinx.coroutines.launch
  * ViewModel for SleepTrackerFragment.
  */
 class SleepTrackerViewModel(
-    private val sleepTrackerRepository: SleepTrackerRepository,
-    application: Application
-) : AndroidViewModel(application) {
+    private val sleepTrackerRepository: SleepTrackerRepository
+) : ViewModel() {
 
     private var currentSleep = MutableLiveData<SleepRecord?>()
     val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()

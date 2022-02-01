@@ -12,7 +12,7 @@ import com.example.android.trackmysleepquality.databinding.ItemSleepRecordGridBi
  * ViewHolder class for SleepRecord
  */
 class SleepRecordViewHolder private constructor(
-    val binding: ItemSleepRecordGridBinding
+    private val binding: ItemSleepRecordGridBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
@@ -23,8 +23,9 @@ class SleepRecordViewHolder private constructor(
         }
     }
 
-    fun bind(record: SleepRecord) = with(binding) {
+    fun bind(record: SleepRecord, clickListener: SleepRecordClickListener) = with(binding) {
         sleepRecord = record
+        sleepRecordClickListener = clickListener
         executePendingBindings()
     }
 }

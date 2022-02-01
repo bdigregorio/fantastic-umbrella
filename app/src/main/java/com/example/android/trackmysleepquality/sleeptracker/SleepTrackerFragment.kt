@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -29,6 +30,7 @@ import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 import com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordAdapter
+import com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordClickListener
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -41,10 +43,7 @@ class SleepTrackerFragment : Fragment() {
         val application = requireNotNull(activity?.application)
         val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
         val sleepTrackerRepository = SleepTrackerRepository(sleepRecordDao)
-        SleepTrackerViewModelFactory(
-            sleepTrackerRepository,
-            application
-        )
+        SleepTrackerViewModelFactory(sleepTrackerRepository)
     }
 
     override fun onCreateView(
@@ -64,7 +63,9 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun configureRecyclerView() {
-        val sleepRecordAdapter = SleepRecordAdapter()
+        val sleepRecordAdapter = SleepRecordAdapter(SleepRecordClickListener { sleepRecordId ->
+            Toast.makeText(context, "Sleep record $sleepRecordId clicked.", Toast.LENGTH_SHORT).show()
+        })
         binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
 
         val gridLayoutManager = GridLayoutManager(context, 3)
@@ -88,14 +89,14 @@ class SleepTrackerFragment : Fragment() {
                     viewModel.awaitNextEvent()
                 }
                 SleepTrackerEvent.Clear -> {
-                    showClearedRecordsSnackbar(view)
+                    showClearedRecordsSnackbar()
                     viewModel.awaitNextEvent()
                 }
             }
         }
     }
 
-    private fun showClearedRecordsSnackbar(root: View?) {
+    private fun showClearedRecordsSnackbar() {
         Snackbar.make(binding.root, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
     }
 

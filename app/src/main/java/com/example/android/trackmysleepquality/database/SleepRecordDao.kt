@@ -31,6 +31,9 @@ interface SleepRecordDao {
     @Update
     suspend fun update(sleepRecord: SleepRecord)
 
+    @Query(value = "SELECT * from sleep_quality_history_table WHERE id = :id")
+    fun getSleepRecordLiveData(id: Long): LiveData<SleepRecord>
+
     @Query(value = "SELECT * FROM sleep_quality_history_table WHERE id = :id")
     suspend fun getSleepRecord(id: Long): SleepRecord
 

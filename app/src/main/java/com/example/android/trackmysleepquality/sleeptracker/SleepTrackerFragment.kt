@@ -24,10 +24,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 import com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordAdapter
+import com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordClickListener
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -40,10 +42,7 @@ class SleepTrackerFragment : Fragment() {
         val application = requireNotNull(activity?.application)
         val sleepRecordDao = SleepDatabase.getInstance(application).sleepRecordDao
         val sleepTrackerRepository = SleepTrackerRepository(sleepRecordDao)
-        SleepTrackerViewModelFactory(
-            sleepTrackerRepository,
-            application
-        )
+        SleepTrackerViewModelFactory(sleepTrackerRepository)
     }
 
     override fun onCreateView(
@@ -63,8 +62,14 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun configureRecyclerView() {
-        val sleepRecordAdapter = SleepRecordAdapter()
+        val sleepRecordAdapter = SleepRecordAdapter(SleepRecordClickListener { sleepRecordId ->
+            viewModel.onSleepRecordClicked(sleepRecordId)
+        })
         binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
+
+        val gridLayoutManager = GridLayoutManager(context, 3)
+        binding.sleepRecordRecyclerView.layoutManager = gridLayoutManager
+
         viewModel.sleepRecords.observe(viewLifecycleOwner) {
             Log.d(TAG, "Observed change in viewmodel's sleep records, updating adapter")
             it?.let { sleepRecordAdapter.submitList(it) }
@@ -72,23 +77,37 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun subscribeToViewModelEvents(viewModel: SleepTrackerViewModel) {
-        viewModel.viewEvents.observe(viewLifecycleOwner) { event: SleepTrackerViewEvent ->
-            Log.i(TAG, "Received SleepTrackerViewEvent: $event")
+        viewModel.sleepTrackerEvent.observe(viewLifecycleOwner) { event: SleepTrackerEvent ->
+            Log.i(TAG, "Received SleepTrackerEvent: $event")
             when (event) {
-                SleepTrackerViewEvent.SubscribeToViewModel -> {
-                    Log.d(TAG, "Observing event stream from ViewModel")
+                SleepTrackerEvent.Await -> {
+                    Log.d(TAG, "Awaiting next ui event")
                 }
-                SleepTrackerViewEvent.ClearAllRecords -> {
-                    showClearedRecordsSnackbar(view)
-                }
-                is SleepTrackerViewEvent.NavigateToQuality -> {
+                is SleepTrackerEvent.Stop -> {
                     navigateToQuality(event.sleepRecordId)
+                    viewModel.awaitNextEvent()
+                }
+                SleepTrackerEvent.Clear -> {
+                    showClearedRecordsSnackbar()
+                    viewModel.awaitNextEvent()
+                }
+                is SleepTrackerEvent.View -> {
+                    navigateToDetail(event.sleepRecordId)
+                    viewModel.awaitNextEvent()
                 }
             }
         }
     }
 
-    private fun showClearedRecordsSnackbar(root: View?) {
+    private fun navigateToDetail(sleepRecordId: Long) {
+        findNavController().navigate(
+            SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepDetailFragment(
+                sleepRecordId
+            )
+        )
+    }
+
+    private fun showClearedRecordsSnackbar() {
         Snackbar.make(binding.root, R.string.cleared_message, Snackbar.LENGTH_LONG).show()
     }
 

@@ -16,11 +16,10 @@
 
 package com.example.android.trackmysleepquality.sleeptracker
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.trackmysleepquality.database.SleepRecord
 import kotlinx.coroutines.launch
@@ -29,9 +28,8 @@ import kotlinx.coroutines.launch
  * ViewModel for SleepTrackerFragment.
  */
 class SleepTrackerViewModel(
-    private val sleepTrackerRepository: SleepTrackerRepository,
-    application: Application
-) : AndroidViewModel(application) {
+    private val sleepTrackerRepository: SleepTrackerRepository
+) : ViewModel() {
 
     private var currentSleep = MutableLiveData<SleepRecord?>()
     val sleepRecords: LiveData<List<SleepRecord>> = sleepTrackerRepository.getAllRecords()
@@ -42,15 +40,18 @@ class SleepTrackerViewModel(
         sleepRecords?.isNotEmpty()?.and(isStopButtonVisible.value?.not() ?: true)
     }
 
-    private val _viewEvents =
-        MutableLiveData<SleepTrackerViewEvent>(SleepTrackerViewEvent.SubscribeToViewModel)
-    val viewEvents: LiveData<SleepTrackerViewEvent>
-        get() = _viewEvents
+    private val _sleepTrackerEvent = MutableLiveData<SleepTrackerEvent>(SleepTrackerEvent.Await)
+    val sleepTrackerEvent: LiveData<SleepTrackerEvent>
+        get() = _sleepTrackerEvent
 
     init {
         viewModelScope.launch {
             currentSleep.value = sleepTrackerRepository.getCurrentSleep()
         }
+    }
+
+    fun awaitNextEvent() {
+        _sleepTrackerEvent.value = SleepTrackerEvent.Await
     }
 
     fun onClickStart() {
@@ -65,7 +66,7 @@ class SleepTrackerViewModel(
             currentSleep.value?.let { sleepRecord ->
                 sleepRecord.endTime = System.currentTimeMillis()
                 sleepTrackerRepository.update(sleepRecord)
-                _viewEvents.value = SleepTrackerViewEvent.NavigateToQuality(sleepRecord.id)
+                _sleepTrackerEvent.value = SleepTrackerEvent.Stop(sleepRecord.id)
             }
         }
     }
@@ -73,8 +74,12 @@ class SleepTrackerViewModel(
     fun onClickClear() {
         viewModelScope.launch {
             sleepTrackerRepository.clearAllRecords()
-            _viewEvents.value = SleepTrackerViewEvent.ClearAllRecords
+            _sleepTrackerEvent.value = SleepTrackerEvent.Clear
         }
+    }
+
+    fun onSleepRecordClicked(sleepRecordId: Long) {
+        _sleepTrackerEvent.value = SleepTrackerEvent.View(sleepRecordId)
     }
 }
 

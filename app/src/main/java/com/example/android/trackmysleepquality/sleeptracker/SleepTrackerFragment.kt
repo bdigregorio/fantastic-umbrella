@@ -21,7 +21,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -64,7 +63,7 @@ class SleepTrackerFragment : Fragment() {
 
     private fun configureRecyclerView() {
         val sleepRecordAdapter = SleepRecordAdapter(SleepRecordClickListener { sleepRecordId ->
-            Toast.makeText(context, "Sleep record $sleepRecordId clicked.", Toast.LENGTH_SHORT).show()
+            viewModel.onSleepRecordClicked(sleepRecordId)
         })
         binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
 
@@ -92,8 +91,20 @@ class SleepTrackerFragment : Fragment() {
                     showClearedRecordsSnackbar()
                     viewModel.awaitNextEvent()
                 }
+                is SleepTrackerEvent.View -> {
+                    navigateToDetail(event.sleepRecordId)
+                    viewModel.awaitNextEvent()
+                }
             }
         }
+    }
+
+    private fun navigateToDetail(sleepRecordId: Long) {
+        findNavController().navigate(
+            SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepDetailFragment(
+                sleepRecordId
+            )
+        )
     }
 
     private fun showClearedRecordsSnackbar() {

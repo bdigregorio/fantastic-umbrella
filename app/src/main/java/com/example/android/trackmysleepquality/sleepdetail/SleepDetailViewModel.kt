@@ -17,37 +17,35 @@
 package com.example.android.trackmysleepquality.sleepdetail
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.trackmysleepquality.database.SleepRecord
 import com.example.android.trackmysleepquality.database.SleepRecordDao
+import kotlinx.coroutines.launch
 
 /**
  * ViewModel for SleepQualityFragment.
  *
- * @param sleepRecordId The key of the current night we are working on.
+ * @param sleepRecordId The key of the current record we are working on.
  */
 class SleepDetailViewModel(
-    private val sleepRecordId: Long = 0L,
-    private val dataSource: SleepRecordDao
+    private val sleepRecordId: Long,
+    private val sleepRecordDao: SleepRecordDao
 ) : ViewModel() {
 
-    private val sleepRecord = MediatorLiveData<SleepRecord>()
+    private val _sleepRecord = MutableLiveData(SleepRecord())
+    val sleepRecord: LiveData<SleepRecord> = _sleepRecord
 
-    private val _navigateToSleepTracker = MutableLiveData<Boolean?>()
-    val navigateToSleepTracker: LiveData<Boolean?>
-        get() = _navigateToSleepTracker
+    private val _navigateToSleepTracker = MutableLiveData(false)
+    val navigateToSleepTracker: LiveData<Boolean> = _navigateToSleepTracker
 
     init {
-        sleepRecord.addSource(dataSource.getSleepRecordLiveData(sleepRecordId), sleepRecord::setValue)
+        viewModelScope.launch {
+            _sleepRecord.value = sleepRecordDao.getSleepRecord(sleepRecordId)
+        }
     }
 
-    fun getSleepRecord() = sleepRecord
-
-    /**
-     * Call this immediately after navigating to [SleepTrackerFragment]
-     */
     fun doneNavigating() {
         _navigateToSleepTracker.value = null
     }

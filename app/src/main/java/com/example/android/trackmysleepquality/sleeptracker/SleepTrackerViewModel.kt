@@ -77,5 +77,9 @@ class SleepTrackerViewModel(
             _sleepTrackerEvent.value = SleepTrackerEvent.Clear
         }
     }
+
+    fun onSleepRecordClicked(sleepRecordId: Long) {
+        _sleepTrackerEvent.value = SleepTrackerEvent.View(sleepRecordId)
+    }
 }
 

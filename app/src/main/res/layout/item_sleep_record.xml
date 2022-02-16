@@ -8,11 +8,16 @@
         <variable
             name="sleepRecord"
             type="com.example.android.trackmysleepquality.database.SleepRecord" />
+
+        <variable
+            name="sleepRecordClickListener"
+            type="com.example.android.trackmysleepquality.sleeptracker.adapter.SleepRecordClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> sleepRecordClickListener.onClick(sleepRecord)}">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/sleepIconContainer"

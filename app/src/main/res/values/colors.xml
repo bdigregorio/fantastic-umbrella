@@ -22,7 +22,9 @@
 
     <color name="main_color">#388310</color>
     <color name="complementary_color">#4B1D82</color>
-    <color name="white_text_color">#f0f0f0</color>
+    <color name="text_inverted">#ffffff</color>
     <color name="color_deactivated">#b2b2b2</color>
+    <color name="background">#ffffff</color>
+    <color name="off_background">#f0f0f0</color>
 
 </resources>

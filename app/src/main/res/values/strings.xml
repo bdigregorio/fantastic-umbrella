@@ -21,6 +21,10 @@
     <string name="sleep_tracker_fragment">SleepTrackerFragment</string>
     <string name="sleep_quality_fragment">SleepQualityFragment</string>
 
+    <!-- UI elements -->
+    <string name="header_text">Sleep Records</string>
+    <string name="close">Close</string>
+
     <!-- Button labels -->
     <string name="start">Start</string>
     <string name="stop">Stop</string>
@@ -57,6 +61,5 @@
 
     <!-- Toast to play after Clear button has been pressed -->
     <string name="cleared_message">All your data is gone forever.</string>
-    <string name="close">Close</string>
 
 </resources>

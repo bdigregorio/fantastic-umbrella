@@ -1,15 +1,14 @@
 package com.example.android.trackmysleepquality.sleeptracker.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.android.trackmysleepquality.database.SleepRecord
 
-class SleepRecordDiffUtil : DiffUtil.ItemCallback<SleepRecord>() {
+class SleepRecordDiffUtil : DiffUtil.ItemCallback<SleepAdapterItem>() {
 
-    override fun areItemsTheSame(oldItem: SleepRecord, newItem: SleepRecord): Boolean {
+    override fun areItemsTheSame(oldItem: SleepAdapterItem, newItem: SleepAdapterItem): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: SleepRecord, newItem: SleepRecord): Boolean {
+    override fun areContentsTheSame(oldItem: SleepAdapterItem, newItem: SleepAdapterItem): Boolean {
         return oldItem == newItem
     }
 }

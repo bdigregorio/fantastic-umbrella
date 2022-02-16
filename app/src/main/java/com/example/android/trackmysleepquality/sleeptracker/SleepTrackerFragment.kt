@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
@@ -66,10 +65,6 @@ class SleepTrackerFragment : Fragment() {
             viewModel.onSleepRecordClicked(sleepRecordId)
         })
         binding.sleepRecordRecyclerView.adapter = sleepRecordAdapter
-
-        val gridLayoutManager = GridLayoutManager(context, 3)
-        binding.sleepRecordRecyclerView.layoutManager = gridLayoutManager
-
         viewModel.sleepRecords.observe(viewLifecycleOwner) {
             Log.d(TAG, "Observed change in viewmodel's sleep records, updating adapter")
             it?.let { sleepRecordAdapter.submitList(it) }
